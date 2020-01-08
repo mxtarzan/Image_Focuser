@@ -25,8 +25,8 @@ using namespace std;
 //==================================================================================
 //	The variables defined here are for you to modify and add to
 //==================================================================================
-#define SEARCHSIZE	12
-#define NUMTHREADS	10
+#define SEARCHSIZE	4
+#define NUMTHREADS	4
 #define OUT_PATH	"./Output/"
 //==================================================================================
 //	Function prototypes

@@ -254,15 +254,14 @@ void initializeApplication(int argc, char**argv)
 	int endx = imageOut->width; 
 	int starty = 0;
 	int endy = imageOut->height/NUMTHREADS;
-	for(int x = imageOut->height/NUMTHREADS; x <= imageOut->height; x=x+imageOut->height/NUMTHREADS){
-		//Create a pthread variable	
-		pthread_t tid;
+  pthread_t pids[NUMTHREADS];
+  for(int c = 0; c < NUMTHREADS; c++){
 		// Struct to store my images, and a start x,y and end x, y.
 		ImageSearchBlock* Data = new ImageSearchBlock{images, startx, endx, starty, endy};
 		starty = starty + imageOut->height/NUMTHREADS;
 		endy = endy + imageOut->height/NUMTHREADS;
 		//Make a thread to get a focused image out of a set of images, and it will not need to return anything.
-		pthread_create(&tid, NULL, GetAllFocused,Data);
+		pthread_create(&(pids[c]), NULL, GetAllFocused,Data);
 	}
 	writeTGA(argv[argc-1], imageOut);
 	srand((unsigned int) time(NULL));
@@ -278,14 +277,12 @@ void* GetAllFocused(void* ptr){
 	int i = data->x0;
 	int j = data->y0;
 	int *outcolor = (int*)imageOut->raster;
-	for(int k = 0; k<(data->x1*data->y1); k++){
-		i = k / data->x1;
-		j = k % data->x1;
-		int focused = GetFocusedPixel(j,i,SEARCHSIZE, images);
-		//focusedpixels.push_back(focused);
+	for(int i = data->x0; i < data->x1; i++){
+    for(int j = data->y0; j < data->y1; j++){	
+    int focused = GetFocusedPixel(i,j,SEARCHSIZE, images);
 		int *tempcolo = (int*)images[focused]->raster;
-		outcolor[i * data->x1 +j] = tempcolo[i * data->x1 + j];
-		//std::cout<<"Percent Finished = "<<((float)k/(images[0]->width*images[0]->height))*100<< '\n';
+		outcolor[j * data->x1 +i] = tempcolo[j * data->x1 + i];
+    }
 	}
 	numLiveFocusingThreads--;
 	return NULL;
